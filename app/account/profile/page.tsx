@@ -1,5 +1,9 @@
 import SelectCountry from "@/app/_components/selectCountry";
 
+export const metadata = {
+  title: 'Upadte profile'
+}
+
 export default function Page() {
   // CHANGE
   const countryFlag = "pt.jpg";
