@@ -1,14 +1,16 @@
 import React from "react";
 import CabinCard from "../_components/cabinCard";
+import { getCabins } from "../_lib/data-service";
+import { Cabin } from "next/font/google";
 
 export const metadata = {
   title: "Cabins",
 };
 
-export default function Page() {
+export default async function Page() {
   // CHANGE
-  const cabins: any = [];
-
+  const cabins: any = await getCabins()
+  console.log(cabins);
   return (
     <div>
       <h1 className="text-4xl mb-5 text-accent-400 font-medium">
