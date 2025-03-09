@@ -1,7 +1,6 @@
-import React from "react";
-import CabinCard from "../_components/cabinCard";
-import { getCabins } from "../_lib/data-service";
-import { Cabin } from "next/font/google";
+import { Suspense } from "react";
+import CabiniList from "../_components/cabiniList";
+import Spinner from "../_components/spinner";
 
 export const metadata = {
   title: "Cabins",
@@ -9,8 +8,7 @@ export const metadata = {
 
 export default async function Page() {
   // CHANGE
-  const cabins: any = await getCabins()
-  console.log(cabins);
+
   return (
     <div>
       <h1 className="text-4xl mb-5 text-accent-400 font-medium">
@@ -24,14 +22,9 @@ export default async function Page() {
         away from home. The perfect spot for a peaceful, calm vacation. Welcome
         to paradise.
       </p>
-
-      {cabins.length > 0 && (
-        <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 xl:gap-14">
-          {cabins.map((cabin: any) => (
-            <CabinCard cabin={cabin} key={cabin.id} />
-          ))}
-        </div>
-      )}
+      <Suspense fallback={<Spinner />}>
+        <CabiniList />
+      </Suspense>
     </div>
   );
 }
