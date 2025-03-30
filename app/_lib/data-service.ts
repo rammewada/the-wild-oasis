@@ -1,10 +1,10 @@
-import { eachDayOfInterval } from "date-fns";
+// import { eachDayOfInterval } from "date-fns";
 import { supabase } from "./supabase";
 import { notFound } from "next/navigation";
 /////////////
 // GET
 
-export async function getCabin(id) {
+export async function getCabin(id: string) {
   const { data, error } = await supabase
     .from("cabins")
     .select("*")

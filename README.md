@@ -1,36 +1,160 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
 ## Getting Started
 
-First, run the development server:
+# Lecture: 456
+
+### Static Site Generation (SSG)
+
+Static Site Generation allows us to deploy our website on any server, where it functions like a regular HTML site. However, a key challenge arises with image optimization. The **Image** tag in Next.js relies on Vercel's server for optimization. If we deploy the static site on a different server, the **Image** tag will not work, and images will not render properly. In short, we lose the ability to optimize images using Next.js's built-in functionality. Additionally, even on the Vercel server, we need to use the standard `<img>` tag for image rendering instead of the **Image** tag.
+
+**Note:** The **Image** tag in Next.js is essentially an API for image optimization.
+
+### Updating the Next.js Configuration
+
+To enable SSG, we need to make changes to the `next.config.js` file as follows:
+
+```javascript
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  /* Add your configuration options here */
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "",
+        port: "",
+        pathname: "/storage/v1/object/public/cabin-images/**",
+        search: "",
+      },
+    ],
+  },
+  output: "export", // Required for SSG
+};
+
+export default nextConfig;
+```
+
+#### [NEXT JS DOCUMENTAION](https://nextjs.org/docs/pages/building-your-application/deploying/static-exports)
+
+This configuration will generate an **out** folder containing all the static files, which can be deployed anywhere. However, it's important to ensure that all components are Server-Side Rendered (SSR) components.
+
+### Running the Development Server
+
+After updating the configuration, run the following command:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Optimizing Images on Non-Vercel Servers
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+If you still want to optimize images while hosting on a non-Vercel server, you can use third-party image optimization services like [Cloudinary](https://cloudinary.com).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+<br/>
+<br/>
 
-## Learn More
+# 457. Partial Pre-Rendering
 
-To learn more about Next.js, take a look at the following resources:
+> 👋 As of Next.js 14, **PPR is highly experimental** and should not be used in production.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- PPR needs to be turned on in config file
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- By default, as much as possible of any route will be statically rendered, creating a static shell
+  Dynamic parts (components) should be placed inside Suspense boundaries
 
-## Deploy on Vercel
+* There are no new APIs to learn
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* These boundaries tell Next.js that anything within the boundary is dynamic
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* The boundary prevents the dynamic part (e.g. reading a header or making a non-cached fetch
+  request) from spreading onto the entire route.
+
+* We provide a static fallback to be shown while the dynamic part is rendering
+  Dynamic components or sub-trees are inserted into the static shell as they become available
+
+![alt text](image.png)
+<br/>
+<br/>
+<br/>
+
+# 458. How Next.js Caches Data
+
+> **Note**: 👋 This behavior applies to **production** mode. Caching doesn’t work in development.
+
+### [Next.js Documentation](https://nextjs.org/docs/app/building-your-application/caching)
+
+### [Udemy Lecture Video](https://www.udemy.com/course/the-ultimate-react-course/learn/lecture/43783788)
+
+---
+
+### Types of Caching in Next.js
+
+#### 1. **Request Memoization**
+
+- Happens on the `server` side.
+- When the same data is requested with the same payload on an **API**, React handles the memoization.
+
+#### 2. **Data Cache**
+
+- Occurs on the `server` side.
+- When multiple users request the same static data, the Next.js server serves the same cached data to everyone.
+- Benefits: Improves **cost-efficiency** and **speed**.
+- **Note**: Cache does not clear on **re-deploy**.
+
+#### 3. **Full Route Cache**
+
+- The `server` serves the full static page to all users.
+- Cache is cleared when the app is **re-deployed**.
+
+#### 4. **Route Cache**
+
+- Happens on the `client` side (e.g., browser back button).
+- Works for both **static** and **dynamic** components:
+  - **Dynamic components**: Cached for `30 seconds`.
+  - **Static pages**: Cached for `5 minutes`.
+- **Note**: Does not work on a **full/hard reload**.
+
+---
+
+### Important Notes on Caching
+
+> **Note**: 👋 We can controle this behaviour of NEXT JS. For more read doc.
+
+- Next.js caching can sometimes negatively impact the user experience.
+- Example:
+  - If backend data changes and the user is on a static route, refreshing with the same payload will not trigger a new **API** request due to caching.
+  - The cached static page will hold the old data for `5 minutes`.
+  - Only after `5 minutes` will the data update upon refresh. 🤦‍♂️
+- This behavior can lead to outdated data being displayed to users.
+
+We can stop this by the revalidate variable in next js both for the component level ant the page level
+We just need to export a revalidate variable with the `Time in sec` the when ever user refresh the page after the revalidate time data will fetch again this is good if we have huge number of trafic on our website so we dont need to send th req again and again we can defined the time
+
+#### Time base revalidation
+
+```javascript
+export const revalidate = 0; //Fetch data on every request
+export const revalidate = 60 * 1; //Fetch data on every min
+```
+
+For fetch data in component level by **Time base revalidation**
+
+```javascript
+import { unstable_store as noStore } from "next/cache";
+
+export default async function CabiniList() {
+  noStore();
+  const cabins: any = await getCabins();
+
+  if (!cabins.length) return null;
+  return (
+    <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 xl:gap-14">
+      {cabins.map((cabin: any) => (
+        <CabinCard cabin={cabin} key={cabin.id} />
+      ))}
+    </div>
+  );
+}
+```
+
+> **NOTE**: There is also path base revalidation you can checkout the **`NEXT JS`** documentation
