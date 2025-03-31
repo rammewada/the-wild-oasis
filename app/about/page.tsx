@@ -2,11 +2,17 @@ import React from "react";
 import Image from "next/image";
 import about_img_01 from "@/public/about-1.jpg";
 import about_img_02 from "@/public/about-2.jpg";
+import Link from "next/link";
+import { getCabin, getCabins } from "../_lib/data-service";
 
 export const metadata = {
   title: "About",
 };
-export default function Page() {
+
+export const revalidate = 86400;
+export default async function Page() {
+  const totalCabin = await getCabins();
+  const totalCabinCount = totalCabin.length;
   return (
     <div className="grid grid-cols-5 gap-x-24 gap-y-32 text-lg items-center">
       <div className="col-span-3">
@@ -23,10 +29,10 @@ export default function Page() {
             simple pleasures with family.
           </p>
           <p>
-            Our 8 luxury cabins provide a cozy base, but the real freedom and
-            peace you'll find in the surrounding mountains. Wander through lush
-            forests, breathe in the fresh air, and watch the stars twinkle above
-            from the warmth of a campfire or your hot tub.
+            Our {totalCabinCount} luxury cabins provide a cozy base, but the
+            real freedom and peace you'll find in the surrounding mountains.
+            Wander through lush forests, breathe in the fresh air, and watch the
+            stars twinkle above from the warmth of a campfire or your hot tub.
           </p>
           <p>
             This is where memorable moments are made, surrounded by nature's
@@ -44,7 +50,7 @@ export default function Page() {
       </div>
 
       <div className="col-span-2">
-        <img src="/about-2.jpg" alt="Family that manages The Wild Oasis" />
+        <Image src={about_img_02} alt="Family that manages The Wild Oasis" />
       </div>
 
       <div className="col-span-3">
@@ -69,12 +75,12 @@ export default function Page() {
           </p>
 
           <div>
-            <a
+            <Link
               href="/cabins"
               className="inline-block mt-4 bg-accent-500 px-8 py-5 text-primary-800 text-lg font-semibold hover:bg-accent-600 transition-all"
             >
               Explore our luxury cabins
-            </a>
+            </Link>
           </div>
         </div>
       </div>

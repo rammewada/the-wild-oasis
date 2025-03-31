@@ -158,3 +158,72 @@ export default async function CabiniList() {
 ```
 
 > **NOTE**: There is also path base revalidation you can checkout the **`NEXT JS`** documentation.
+
+ <br/>
+ <br/>
+ <br/>
+
+# **Section 35**: Client server intraction
+
+# 462. Blurring the Boundary Between Server and Client (RSC – Part 4)
+
+#### **Traditional Approach**
+
+![alt text](image-1.png)
+
+#### **Next js with RSC + SA**
+
+> **NOTE**: This process called Knitting.
+
+![alt text](image-2.png)
+
+- SC(**server component**)
+- CC (**client component**)
+
+```javascript
+NOTE: If we pass a SC component as a chinder props to client component it will as a server component
+'use client'
+import D from 'D' //Client component
+import C from  "C" //Server component
+
+
+return <D>
+           <C/>
+        <D>
+
+Then C always work as a server component because we pass C as a chindren and will not cross the boundry on server
+```
+
+```javascript
+NOTE: If we not pass SC to a client one that i will work as a client component as cross the boundry on server
+
+'use client'
+import D from 'D' //Client component
+import C from  "C" //Server component
+
+
+return <div>
+           <D/>
+           <C/>
+        </div>
+
+Now C cross the boundry of the server and become client component
+```
+
+```javascript
+NOTE: A server component can work as a client and server component at the same time
+
+'use client'
+import D from 'D' //Client component
+import C from  "C" //Server component
+
+
+return <div>
+           <D>
+           <C/> // Still work as a server component
+           </D>
+           <C/> // not a childrent so its becomes client component
+        </div>
+```
+
+![alt text](image-3.png)
