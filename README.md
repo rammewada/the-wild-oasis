@@ -157,4 +157,4 @@ export default async function CabiniList() {
 }
 ```
 
-> **NOTE**: There is also path base revalidation you can checkout the **`NEXT JS`** documentation
+> **NOTE**: There is also path base revalidation you can checkout the **`NEXT JS`** documentation.
