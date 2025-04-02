@@ -222,7 +222,7 @@ return <div>
            <D>
            <C/> // Still work as a server component
            </D>
-           <C/> // not a childrent so its becomes client component
+           <C/> // not a childrent of client so its becomes client component
         </div>
 ```
 
